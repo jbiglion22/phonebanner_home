@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>폰전광판 · Phone Banner</title>
+<meta name="description" content="폰 하나로 띄우는 응원 LED 전광판. 문구만 쓰면 바로 가로 전체화면 전광판이 됩니다.">
+<link rel="alternate" hreflang="en" href="index.html">
+<link rel="alternate" hreflang="ko" href="ko.html">
+<link rel="alternate" hreflang="x-default" href="index.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=Noto+Sans+KR:wght@900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#2563EB; --primary-deep:#1E3A8A; --primary-soft:#E8F0FF;
+  --bg:#EEF3FB; --surface:#FFFFFF; --ink:#0E1B3D; --sub:#55617E; --line:#D9E2F2;
+  --screen:#05070D; --bezel:#0B1222; --edge:#3A4C78;
+  --pink:#FF4D8D; --yellow:#FFD23D; --cyan:#3DE8FF; --lime:#C6FF3D;
+  --radius:20px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1020; --surface:#141B2E; --ink:#EEF2FB; --sub:#A3AEC8; --line:#26304A; --primary-soft:#1A2A52;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1020; --surface:#141B2E; --ink:#EEF2FB; --sub:#A3AEC8; --line:#26304A; --primary-soft:#1A2A52;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans KR',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+img,canvas{display:block;max-width:100%}
+a{color:var(--primary)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+h1,h2,h3{line-height:1.25;margin:0;letter-spacing:-0.02em}
+p{margin:0}
+
+/* ───── 상단 ───── */
+.nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:12px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;color:var(--ink);text-decoration:none}
+.logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#4C86FF,#1E3A8A);display:grid;place-items:center}
+.logo i{display:grid;grid-template-columns:repeat(3,4px);gap:3px}
+.logo b{width:4px;height:4px;border-radius:50%;background:var(--pink)}
+.logo b.o{opacity:.3}
+.nav ul{display:flex;gap:4px;list-style:none;margin:0 0 0 auto;padding:0}
+.nav ul a{display:block;padding:8px 12px;border-radius:10px;color:var(--sub);text-decoration:none;font-size:14px}
+.nav ul a:hover{background:var(--primary-soft);color:var(--primary)}
+.nav .lang{margin-left:8px;flex:none;display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--line);color:var(--ink);text-decoration:none;font-size:14px;font-weight:500}
+.nav .lang:hover{border-color:var(--primary);color:var(--primary)}
+.nav .lang svg{width:16px;height:16px}
+@media (max-width:720px){.nav ul{display:none}.nav .lang{margin-left:auto}}
+
+/* ───── 히어로 ───── */
+.hero{background:linear-gradient(135deg,#4C86FF 0%,#2563EB 45%,#1E3A8A 100%);color:#fff;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:-40% auto auto -20%;width:70%;height:120%;background:radial-gradient(closest-side,rgba(255,255,255,.22),transparent);pointer-events:none}
+.hero .wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:48px;align-items:center;padding-top:72px;padding-bottom:80px;position:relative}
+.hero h1{font-size:clamp(40px,6vw,64px);font-weight:700}
+.hero .lead{font-size:clamp(17px,2vw,20px);margin-top:14px;color:#E3EBFF}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.chips span{padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.16);font-size:14px;font-weight:500}
+@media (max-width:860px){.hero .wrap{grid-template-columns:1fr;gap:36px;padding-top:48px;padding-bottom:56px}}
+
+/* 가로 폰 */
+.phone{position:relative;border-radius:34px;padding:2px;background:linear-gradient(135deg,#5A6E9E,#1C2747);box-shadow:0 30px 60px rgba(0,10,51,.45)}
+.phone-inner{border-radius:32px;background:var(--bezel);padding:16px 26px;position:relative}
+.phone-inner::before{content:"";position:absolute;left:11px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:#2A3550}
+.screen{border-radius:12px;background:var(--screen);overflow:hidden;aspect-ratio:2.1/1;position:relative}
+.screen canvas{width:100%;height:100%}
+.screen::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.07),transparent 45%);pointer-events:none}
+
+/* ───── 섹션 공통 ───── */
+section{padding:88px 0}
+.eyebrow{display:inline-block;font-size:13px;font-weight:700;color:var(--primary);background:var(--primary-soft);padding:4px 12px;border-radius:999px}
+.sec-title{font-size:clamp(28px,4vw,40px);font-weight:700;margin-top:14px}
+.sec-lead{color:var(--sub);font-size:17px;margin-top:10px;max-width:640px}
+@media (max-width:720px){section{padding:64px 0}}
+
+/* 쓰임 */
+.uses{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:36px}
+.use{background:var(--surface);border-radius:var(--radius);padding:16px;border:1px solid var(--line)}
+.use .mini{border-radius:12px;background:var(--screen);aspect-ratio:2.2/1;overflow:hidden}
+.use .mini canvas{width:100%;height:100%}
+.use h3{font-size:18px;margin-top:14px}
+.use p{color:var(--sub);font-size:14px;margin-top:4px}
+@media (max-width:900px){.uses{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.uses{grid-template-columns:1fr}}
+
+/* 기능 */
+.features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:36px}
+.feat{background:var(--surface);border-radius:var(--radius);padding:24px;border:1px solid var(--line)}
+.feat .ic{width:44px;height:44px;border-radius:14px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center}
+.feat .ic svg{width:22px;height:22px}
+.feat h3{font-size:19px;margin-top:16px}
+.feat p{color:var(--sub);font-size:15px;margin-top:6px}
+.feat ul{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.feat li{font-size:14px;color:var(--ink);padding-left:18px;position:relative}
+.feat li::before{content:"";position:absolute;left:2px;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--primary)}
+@media (max-width:900px){.features{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.features{grid-template-columns:1fr}}
+
+/* 체험 */
+.try{background:var(--surface);border-radius:28px;border:1px solid var(--line);padding:28px;margin-top:36px;display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:start}
+.try .phone{box-shadow:0 18px 40px rgba(0,10,51,.25)}
+.ctrl{display:flex;flex-direction:column;gap:18px}
+.ctrl label.t,.ctrl .t{font-size:14px;font-weight:700;display:block;margin-bottom:8px}
+.ctrl input[type=text]{width:100%;height:50px;border-radius:14px;border:1.5px solid var(--primary);background:transparent;color:var(--ink);font:inherit;font-size:17px;padding:0 14px}
+.sw{display:flex;flex-wrap:wrap;gap:10px}
+.sw button{width:36px;height:36px;border-radius:50%;border:2px solid transparent;padding:3px;background:none;cursor:pointer}
+.sw button span{display:block;width:100%;height:100%;border-radius:50%;border:1px solid var(--line)}
+.sw button[aria-pressed=true]{border-color:var(--primary)}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--bg);border-radius:12px;padding:4px;gap:4px}
+.seg button{height:40px;border:0;border-radius:9px;background:transparent;color:var(--sub);font:inherit;font-size:14px;font-weight:500;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--surface);color:var(--ink);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.toggles{display:flex;flex-wrap:wrap;gap:8px}
+.toggles button{height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--sub);font:inherit;font-size:14px;cursor:pointer}
+.toggles button[aria-pressed=true]{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700}
+@media (max-width:860px){.try{grid-template-columns:1fr;padding:18px}}
+
+/* 템플릿 */
+.tpl-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:28px}
+.tpl{background:var(--surface);border-radius:16px;padding:8px;border:1px solid var(--line)}
+.tpl .mini{border-radius:10px;aspect-ratio:2/1;overflow:hidden;background:var(--screen)}
+.tpl .mini canvas{width:100%;height:100%}
+.tpl .row{display:flex;justify-content:space-between;align-items:center;padding:8px 4px 2px;font-size:14px}
+.tpl .row small{color:var(--sub);font-size:12px}
+.teams{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.teams button{display:flex;align-items:center;gap:6px;height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.teams button[aria-pressed=true]{border-color:var(--primary);background:var(--primary-soft);font-weight:700}
+.teams i{width:14px;height:14px;border-radius:50%;border:1px solid var(--line)}
+@media (max-width:900px){.tpl-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* 재생 */
+.play-wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:center;margin-top:36px}
+.play-list{display:flex;flex-direction:column;gap:12px}
+.play-item{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px}
+.play-item .ic{flex:none;width:40px;height:40px;border-radius:12px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center}
+.play-item .ic svg{width:20px;height:20px}
+.play-item h3{font-size:16px}
+.play-item p{font-size:14px;color:var(--sub);margin-top:2px}
+.overlay{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:linear-gradient(rgba(0,0,0,.8),transparent);pointer-events:none;opacity:0;transition:opacity .3s}
+.overlay.show{opacity:1}
+.overlay .grp{display:flex;gap:8px;align-items:center}
+.overlay .b{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center;color:#fff}
+.overlay .b.p{background:var(--primary)}
+.overlay .b svg{width:16px;height:16px}
+.overlay .spd{height:34px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;font-size:12px;display:flex;align-items:center}
+.tap-hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:12px;color:#E3E8F5;background:rgba(0,0,0,.6);padding:4px 12px;border-radius:999px;white-space:nowrap}
+@media (max-width:860px){.play-wrap{grid-template-columns:1fr}}
+
+/* 저장 */
+.save-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:36px}
+@media (max-width:860px){.save-grid{grid-template-columns:1fr}}
+
+/* 약속 */
+.promise{background:linear-gradient(135deg,#1E3A8A,#0E1B3D);color:#fff;border-radius:28px;padding:44px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.promise h3{font-size:20px}
+.promise p{color:#C9D6F2;font-size:15px;margin-top:6px}
+.promise .num{font-family:'Noto Sans KR',sans-serif;font-weight:900;font-size:32px;color:var(--yellow)}
+@media (max-width:860px){.promise{grid-template-columns:1fr;padding:28px}}
+
+footer{padding:40px 0 56px;color:var(--sub);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:24px}
+
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="폰전광판 처음으로">
+      <span class="logo" aria-hidden="true"><i><b></b><b class="o"></b><b></b><b></b><b></b><b></b><b class="o"></b><b></b><b class="o"></b></i></span>
+      폰전광판
+    </a>
+    <ul>
+      <li><a href="#uses">이럴 때</a></li>
+      <li><a href="#features">기능</a></li>
+      <li><a href="#try">직접 해 보기</a></li>
+      <li><a href="#templates">템플릿</a></li>
+      <li><a href="#play">재생 화면</a></li>
+    </ul>
+    <a class="lang" href="index.html" hreflang="en" lang="en"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>English</a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- 히어로 -->
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <h1>폰전광판</h1>
+        <p class="lead">문구만 쓰면 바로 전광판.<br>폰 하나로 띄우는 응원 LED 전광판이에요.</p>
+        <div class="chips" aria-label="쓰임새">
+          <span>야구</span><span>축구</span><span>콘서트</span><span>생일</span><span>공항 마중</span>
+        </div>
+      </div>
+      <div class="phone" aria-hidden="true">
+        <div class="phone-inner"><div class="screen"><canvas id="heroLed"></canvas></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 쓰임 -->
+  <section id="uses">
+    <div class="wrap">
+      <span class="eyebrow">이럴 때 써요</span>
+      <h2 class="sec-title">어디서든 마음을 크게 보여 주세요</h2>
+      <p class="sec-lead">관중석, 공연장, 생일 파티, 공항 입국장까지. 하고 싶은 말을 멀리서도 보이는 LED 글자로 띄워요.</p>
+      <div class="uses">
+        <article class="use"><div class="mini"><canvas data-led='{"text":"홈런!","color":"#FFD23D","fixed":true,"glow":true}'></canvas></div><h3>야구장 · 축구장</h3><p>홈런, 골, 선수 응원을 한 번에.</p></article>
+        <article class="use"><div class="mini"><canvas data-led='{"text":"사랑해요 ♥","color":"#FF4D8D","blink":true}'></canvas></div><h3>콘서트</h3><p>좋아하는 마음을 반짝이게.</p></article>
+        <article class="use"><div class="mini"><canvas data-led='{"text":"생일 축하해","rainbow":true}'></canvas></div><h3>생일 · 기념일</h3><p>무지개 글자로 깜짝 축하.</p></article>
+        <article class="use"><div class="mini"><canvas data-led='{"text":"환영해요!","color":"#FFFFFF"}'></canvas></div><h3>공항 마중</h3><p>멀리서도 한눈에 알아보게.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 기능 -->
+  <section id="features" style="padding-top:0">
+    <div class="wrap">
+      <span class="eyebrow">주요 기능</span>
+      <h2 class="sec-title">쓰고, 꾸미고, 바로 띄워요</h2>
+      <p class="sec-lead">복잡한 설정 없이 두 번만 누르면 재생. 원하는 만큼 꾸미는 것도 간단해요.</p>
+      <div class="features">
+        <article class="feat">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg></div>
+          <h3>바로 띄우기</h3>
+          <p>첫 화면에 문구를 쓰고 ▶를 누르면 끝. 가로 전체화면 LED 전광판이 돼요.</p>
+          <ul><li>최근 문구는 한 번 눌러 다시 재생</li><li>길게 눌러 편집하거나 목록에서 지우기</li></ul>
+        </article>
+        <article class="feat">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></div>
+          <h3>내 마음대로 꾸미기</h3>
+          <p>글자·색상·움직임·효과·LED 다섯 가지 탭으로 원하는 모양을 만들어요.</p>
+          <ul><li>글자색 7가지 · 배경색 · 무지개</li><li>깜빡임 · 글로우 · 배경 색 순환</li><li>원 · 사각 · 하트 · 별 도트</li></ul>
+        </article>
+        <article class="feat">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+          <h3>템플릿과 팀 컬러</h3>
+          <p>야구·축구·콘서트·생일·고백·마중 문구를 골라 바로 쓰거나 고쳐 써요.</p>
+          <ul><li>21가지 응원 템플릿</li><li>팀 컬러 조합으로 한 번에 색 바꾸기</li></ul>
+        </article>
+        <article class="feat">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h.01M11 14h.01M15 14h.01" stroke-linecap="round" stroke-width="2.4"/></svg></div>
+          <h3>한글이 또렷한 LED</h3>
+          <p>받침까지 읽히도록 글자 크기를 세로 도트 수로 정해요. 크고 거칠게부터 작고 선명하게까지.</p>
+          <ul><li>세로 16~48 도트 조절</li><li>도트 크기 · 꺼진 도트 밝기</li></ul>
+        </article>
+        <article class="feat">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.9z" stroke-linejoin="round"/></svg></div>
+          <h3>내 전광판</h3>
+          <p>마음에 드는 전광판은 저장해 두고 한 번에 다시 띄워요.</p>
+          <ul><li>즐겨찾기 · 최근 사용 순서</li><li>편집 · 복제 · 삭제 (실수해도 되돌리기)</li></ul>
+        </article>
+        <article class="feat">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+          <h3>응원에 집중하는 재생</h3>
+          <p>재생 중에는 전광판만. 실수로 꺼지지 않게 화면 잠금도 있어요.</p>
+          <ul><li>최대 밝기 · 화면 꺼짐 방지</li><li>속도 조절 · 일시정지 · 좌우 반전</li></ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 체험 -->
+  <section id="try" style="padding-top:0">
+    <div class="wrap">
+      <span class="eyebrow">직접 해 보기</span>
+      <h2 class="sec-title">이 화면에서 바로 꾸며 보세요</h2>
+      <p class="sec-lead">앱의 편집 화면과 같은 방식으로 움직여요. 문구를 바꾸고 색과 효과를 눌러 보세요.</p>
+      <div class="try">
+        <div class="phone" aria-hidden="true">
+          <div class="phone-inner"><div class="screen"><canvas id="tryLed"></canvas></div></div>
+        </div>
+        <div class="ctrl">
+          <div>
+            <label class="t" for="tryText">문구</label>
+            <input id="tryText" type="text" maxlength="30" value="대한민국 파이팅!">
+          </div>
+          <div>
+            <span class="t" id="colorLabel">글자 색</span>
+            <div class="sw" role="group" aria-labelledby="colorLabel" id="trySwatches"></div>
+          </div>
+          <div>
+            <span class="t" id="moveLabel">움직임</span>
+            <div class="seg" role="group" aria-labelledby="moveLabel" id="tryMove">
+              <button type="button" data-v="left" aria-pressed="true">← 왼쪽</button>
+              <button type="button" data-v="none" aria-pressed="false">고정</button>
+              <button type="button" data-v="right" aria-pressed="false">오른쪽 →</button>
+            </div>
+          </div>
+          <div>
+            <span class="t" id="fxLabel">효과</span>
+            <div class="toggles" role="group" aria-labelledby="fxLabel" id="tryFx">
+              <button type="button" data-k="glow" aria-pressed="true">글로우</button>
+              <button type="button" data-k="blink" aria-pressed="false">깜빡임</button>
+              <button type="button" data-k="rainbow" aria-pressed="false">무지개</button>
+            </div>
+          </div>
+          <div>
+            <span class="t" id="dotLabel">도트 모양</span>
+            <div class="seg" role="group" aria-labelledby="dotLabel" id="tryDot">
+              <button type="button" data-v="round" aria-pressed="true">원</button>
+              <button type="button" data-v="square" aria-pressed="false">사각</button>
+              <button type="button" data-v="heart" aria-pressed="false">하트</button>
+              <button type="button" data-v="star" aria-pressed="false">별</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 템플릿 -->
+  <section id="templates" style="padding-top:0">
+    <div class="wrap">
+      <span class="eyebrow">템플릿</span>
+      <h2 class="sec-title">고르기만 하면 응원 준비 끝</h2>
+      <p class="sec-lead">카드를 고르면 그 설정 그대로 편집 화면이 열려요. 팀 컬러를 고르면 모든 템플릿이 그 색으로 바뀌어요.</p>
+      <div class="teams" role="group" aria-label="팀 컬러" id="teams"></div>
+      <div class="tpl-grid" id="tplGrid"></div>
+    </div>
+  </section>
+
+  <!-- 재생 -->
+  <section id="play" style="padding-top:0">
+    <div class="wrap">
+      <span class="eyebrow">재생 화면</span>
+      <h2 class="sec-title">평소엔 전광판만, 필요할 때만 버튼</h2>
+      <p class="sec-lead">화면을 탭하면 위쪽에 컨트롤이 잠깐 나타났다 사라져요. 아래 화면을 눌러 보세요.</p>
+      <div class="play-wrap">
+        <div>
+          <div class="phone">
+            <div class="phone-inner">
+              <div class="screen" id="playScreen" role="button" tabindex="0" aria-label="재생 화면 예시. 누르면 컨트롤이 보여요">
+                <canvas id="playLed"></canvas>
+                <div class="overlay" id="playOverlay" aria-hidden="true">
+                  <span class="b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>
+                  <span class="grp">
+                    <span class="spd">− 속도 5 +</span>
+                    <span class="b p"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></span>
+                    <span class="b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+                  </span>
+                </div>
+                <span class="tap-hint" id="tapHint">화면을 눌러 보세요</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="play-list">
+          <div class="play-item"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span><div><h3>최대 밝기 · 화면 꺼짐 방지</h3><p>재생하는 동안만 가장 밝게, 화면이 꺼지지 않게. 나오면 원래대로 돌아가요.</p></div></div>
+          <div class="play-item"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5v14"/></svg></span><div><h3>속도 조절 · 일시정지</h3><p>재생 중에도 속도를 바꿀 수 있고, 글자가 튀지 않고 그 자리에서 이어져요.</p></div></div>
+          <div class="play-item"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><h3>화면 잠금</h3><p>잠그면 터치와 뒤로가기가 막혀요. 자물쇠를 길게 눌러야 풀려서 응원 중에 꺼질 걱정이 없어요.</p></div></div>
+          <div class="play-item"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg></span><div><h3>좌우 반전</h3><p>유리창 너머나 뒤쪽 사람에게 보여 줄 때 글자를 거울처럼 뒤집어요.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 약속 -->
+  <section style="padding-top:0">
+    <div class="wrap">
+      <div class="promise">
+        <div><div class="num">2탭</div><h3>문구 입력부터 재생까지</h3><p>쓰고, 누르면 끝. 응원은 타이밍이니까요.</p></div>
+        <div><div class="num">오프라인</div><h3>인터넷 없이 동작</h3><p>데이터가 잘 안 터지는 경기장에서도 그대로 써요.</p></div>
+        <div><div class="num">내 폰 안에</div><h3>저장은 기기에만</h3><p>만든 전광판과 최근 문구는 내 폰에만 저장돼요.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 폰전광판 · Phone Banner</span>
+    <span>구단 이름·로고는 포함하지 않아요. 팀 컬러는 색 조합만 제공합니다.</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const RAINBOW = ['#FF4D8D', '#FFD23D', '#C6FF3D', '#3DE8FF', '#9B6BFF'];
+  const FONT = "900 100px 'Noto Sans KR', 'IBM Plex Sans KR', sans-serif";
+
+  // 글자를 세로 rows칸 도트로 바꾼다 (앱의 LedMask와 같은 방식)
+  function buildMask(text, rows) {
+    const c = document.createElement('canvas');
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.font = FONT.replace('100px', Math.round(rows * 0.92) + 'px');
+    const w = Math.max(1, Math.ceil(ctx.measureText(text).width));
+    c.width = w; c.height = rows;
+    ctx.font = FONT.replace('100px', Math.round(rows * 0.92) + 'px');
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(text, 0, rows / 2 + rows * 0.04);
+    const data = ctx.getImageData(0, 0, w, rows).data;
+    const bits = new Uint8Array(w * rows);
+    for (let i = 0; i < bits.length; i++) bits[i] = data[i * 4 + 3] > 110 ? 1 : 0;
+    return { cols: w, rows, on: (x, y) => x >= 0 && x < w && y >= 0 && y < rows && bits[y * w + x] === 1 };
+  }
+
+  function shapePath(ctx, shape, x, y, r) {
+    if (shape === 'square') { ctx.rect(x - r, y - r, r * 2, r * 2); return; }
+    if (shape === 'heart') {
+      const s = r * 2, l = x - r, t = y - r;
+      ctx.moveTo(l + s * .5, t + s * .92);
+      ctx.bezierCurveTo(l + s * .12, t + s * .68, l, t + s * .45, l, t + s * .3);
+      ctx.bezierCurveTo(l, t + s * .12, l + s * .14, t, l + s * .3, t);
+      ctx.bezierCurveTo(l + s * .4, t, l + s * .47, t + s * .06, l + s * .5, t + s * .14);
+      ctx.bezierCurveTo(l + s * .53, t + s * .06, l + s * .6, t, l + s * .7, t);
+      ctx.bezierCurveTo(l + s * .86, t, l + s, t + s * .12, l + s, t + s * .3);
+      ctx.bezierCurveTo(l + s, t + s * .45, l + s * .88, t + s * .68, l + s * .5, t + s * .92);
+      ctx.closePath(); return;
+    }
+    if (shape === 'star') {
+      for (let i = 0; i < 10; i++) {
+        const rr = i % 2 ? r * .45 : r, a = (-90 + i * 36) * Math.PI / 180;
+        const px = x + rr * Math.cos(a), py = y + r * .08 + rr * Math.sin(a);
+        i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+      }
+      ctx.closePath(); return;
+    }
+    ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, Math.PI * 2);
+  }
+
+  // 하나의 LED 전광판
+  class Led {
+    constructor(canvas, opts) {
+      this.canvas = canvas; this.ctx = canvas.getContext('2d');
+      this.set(Object.assign({ text: ' ', color: '#FF4D8D', bg: '#05070D', rows: 16, speed: 14, dir: 'left',
+        fixed: false, glow: false, blink: false, rainbow: false, shape: 'round', paused: false }, opts));
+      this.start = performance.now();
+    }
+    set(o) {
+      this.o = Object.assign({}, this.o, o);
+      if (this.o.fixed) this.o.dir = 'none';
+      const key = this.o.text + '|' + this.o.rows;
+      if (key !== this.key) { this.key = key; this.mask = buildMask(this.o.text || ' ', this.o.rows); }
+    }
+    resize() {
+      const r = this.canvas.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1);
+      const w = Math.round(r.width * d), h = Math.round(r.height * d);
+      if (w && h && (this.canvas.width !== w || this.canvas.height !== h)) { this.canvas.width = w; this.canvas.height = h; }
+    }
+    draw(now) {
+      const { ctx, canvas, o, mask } = this;
+      const W = canvas.width, H = canvas.height; if (!W || !H) return;
+      const t = (reduceMotion || o.paused ? 0 : (now - this.start)) / 1000;
+      ctx.fillStyle = o.bg; ctx.fillRect(0, 0, W, H);
+      const pitch = H / o.rows, vis = Math.ceil(W / pitch), total = mask.cols + vis;
+      const scroll = o.dir !== 'none' && !reduceMotion;
+      const shift = scroll ? Math.floor(t * o.speed) % total : 0;
+      const pad = Math.floor((vis - mask.cols) / 2);
+      const blinkOff = o.blink && !reduceMotion && Math.floor(t / .5) % 2 === 1;
+      const x0 = (W - (vis - 1) * pitch) / 2, y0 = pitch / 2, r = pitch * .42;
+      const off = new Path2D ? null : null;
+      // 꺼진 칸
+      ctx.beginPath();
+      const lit = [];
+      for (let c = 0; c < vis; c++) {
+        const src = !scroll ? c - pad : (o.dir === 'right' ? c - shift + mask.cols : c + shift - vis);
+        for (let y = 0; y < o.rows; y++) {
+          const px = x0 + c * pitch, py = y0 + y * pitch;
+          if (!blinkOff && mask.on(src, y)) lit.push(px, py);
+          else shapePath(ctx, o.shape, px, py, r);
+        }
+      }
+      ctx.fillStyle = 'rgba(255,255,255,0.07)'; ctx.fill();
+      if (!lit.length) return;
+      let fill = o.color;
+      if (o.rainbow) {
+        const g = ctx.createLinearGradient(0, 0, W, 0), m = (t * .25) % 1;
+        RAINBOW.forEach((col, i) => g.addColorStop(((i / (RAINBOW.length - 1)) + m) % 1, col));
+        fill = g;
+      }
+      if (o.glow) {
+        ctx.beginPath();
+        for (let i = 0; i < lit.length; i += 2) { ctx.moveTo(lit[i] + r * 2.2, lit[i + 1]); ctx.arc(lit[i], lit[i + 1], r * 2.2, 0, Math.PI * 2); }
+        ctx.globalAlpha = .16; ctx.fillStyle = fill; ctx.fill(); ctx.globalAlpha = 1;
+      }
+      ctx.beginPath();
+      for (let i = 0; i < lit.length; i += 2) shapePath(ctx, o.shape, lit[i], lit[i + 1], r);
+      ctx.fillStyle = fill; ctx.fill();
+    }
+  }
+
+  const boards = [];
+  const add = (canvas, opts) => { const b = new Led(canvas, opts); boards.push(b); return b; };
+
+  // 화면에 보이는 것만 그린다
+  const visible = new WeakSet();
+  const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? visible.add(e.target) : visible.delete(e.target)));
+  function track(b) { io.observe(b.canvas); return b; }
+
+  // 히어로
+  track(add(document.getElementById('heroLed'), { text: '대한민국 파이팅!', rows: 18, speed: 16, glow: true }));
+  // 쓰임 카드
+  document.querySelectorAll('canvas[data-led]').forEach(c => {
+    const d = JSON.parse(c.dataset.led);
+    track(add(c, { text: d.text, color: d.color || '#FF4D8D', rows: 12, speed: 10, fixed: !!d.fixed, glow: !!d.glow, blink: !!d.blink, rainbow: !!d.rainbow }));
+  });
+
+  // 체험
+  const tryBoard = track(add(document.getElementById('tryLed'), { text: '대한민국 파이팅!', rows: 18, speed: 16, glow: true }));
+  const colors = [['#FF4D8D', '핑크'], ['#FF3B3B', '빨강'], ['#FF9A1F', '주황'], ['#FFD23D', '노랑'], ['#C6FF3D', '라임'], ['#3DE8FF', '시안'], ['#FFFFFF', '흰색']];
+  const sw = document.getElementById('trySwatches');
+  colors.forEach(([hex, name], i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.setAttribute('aria-label', name); b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    b.innerHTML = '<span style="background:' + hex + '"></span>';
+    b.addEventListener('click', () => {
+      sw.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', 'false'));
+      b.setAttribute('aria-pressed', 'true');
+      tryBoard.set({ color: hex, rainbow: false });
+      document.querySelector('#tryFx [data-k=rainbow]').setAttribute('aria-pressed', 'false');
+    });
+    sw.appendChild(b);
+  });
+  document.getElementById('tryText').addEventListener('input', e => tryBoard.set({ text: e.target.value || ' ' }));
+  function segment(id, apply) {
+    const g = document.getElementById(id);
+    g.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      g.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', 'false'));
+      b.setAttribute('aria-pressed', 'true'); apply(b.dataset.v);
+    }));
+  }
+  segment('tryMove', v => tryBoard.set({ dir: v, fixed: false }));
+  segment('tryDot', v => tryBoard.set({ shape: v }));
+  document.querySelectorAll('#tryFx button').forEach(b => b.addEventListener('click', () => {
+    const on = b.getAttribute('aria-pressed') !== 'true';
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    tryBoard.set({ [b.dataset.k]: on });
+  }));
+
+  // 템플릿
+  const templates = [
+    ['홈런!', '#FFD23D', '야구', { fixed: true, glow: true }],
+    ['삼진 아웃!', '#3DE8FF', '야구', {}],
+    ['골!', '#C6FF3D', '축구', { fixed: true, blink: true }],
+    ['대~한민국', '#FF3B3B', '축구', {}],
+    ['우리 오빠 최고!', '#B98CFF', '콘서트', { shape: 'star' }],
+    ['생일 축하해', '#FFB020', '생일', { rainbow: true }],
+    ['사랑해 ♥', '#FF4D8D', '고백', { blink: true, shape: 'heart' }],
+    ['환영해요!', '#FFFFFF', '마중', {}],
+  ];
+  const teams = [
+    [null, '기본 색'], [['#FF3B3B', '#000000'], '빨강·검정'], [['#FFFFFF', '#0B3D91'], '파랑·흰색'],
+    [['#FF8A1F', '#000000'], '주황·검정'], [['#FF3B3B', '#0B1840'], '남색·빨강'], [['#FFD23D', '#0B1840'], '노랑·남색'], [['#FFFFFF', '#0B5A32'], '초록·흰색'],
+  ];
+  const grid = document.getElementById('tplGrid');
+  const tplBoards = templates.map(([text, color, cat, extra]) => {
+    const card = document.createElement('div'); card.className = 'tpl';
+    card.innerHTML = '<div class="mini"><canvas></canvas></div><div class="row"><span></span><small></small></div>';
+    card.querySelector('.row span').textContent = text;
+    card.querySelector('.row small').textContent = cat;
+    grid.appendChild(card);
+    const fixedLong = extra.fixed && text.length > 4;
+    const b = track(add(card.querySelector('canvas'), Object.assign({ text, color, rows: 12, speed: 9, glow: true }, extra, fixedLong ? { fixed: false } : {})));
+    b.base = { color, rainbow: !!extra.rainbow };
+    return b;
+  });
+  const teamBox = document.getElementById('teams');
+  teams.forEach(([pair, name], i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    b.innerHTML = (pair ? '<i style="background:' + pair[0] + '"></i><i style="background:' + pair[1] + '"></i>' : '') + '<span></span>';
+    b.querySelector('span').textContent = name;
+    b.addEventListener('click', () => {
+      teamBox.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', 'false'));
+      b.setAttribute('aria-pressed', 'true');
+      tplBoards.forEach(tb => tb.set(pair ? { color: pair[0], bg: pair[1], rainbow: false } : { color: tb.base.color, bg: '#05070D', rainbow: tb.base.rainbow }));
+    });
+    teamBox.appendChild(b);
+  });
+
+  // 재생 화면 예시: 탭하면 컨트롤 3초
+  const playBoard = track(add(document.getElementById('playLed'), { text: '홈런 가즈아!', color: '#FFD23D', rows: 18, speed: 16, glow: true }));
+  const overlay = document.getElementById('playOverlay'), hint = document.getElementById('tapHint'), scr = document.getElementById('playScreen');
+  let hideTimer;
+  function showControls() {
+    overlay.classList.add('show'); hint.textContent = '3초 뒤 메뉴가 사라져요';
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => { overlay.classList.remove('show'); hint.textContent = '화면을 눌러 보세요'; }, 3000);
+  }
+  scr.addEventListener('click', showControls);
+  scr.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showControls(); } });
+
+  // 그리기
+  function frame(now) {
+    for (const b of boards) { if (visible.has(b.canvas)) { b.resize(); b.draw(now); } }
+    if (!reduceMotion) requestAnimationFrame(frame);
+  }
+  const begin = () => { boards.forEach(b => { b.key = null; b.set({}); }); requestAnimationFrame(frame); if (reduceMotion) setTimeout(() => boards.forEach(b => { b.resize(); b.draw(0); }), 50); };
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(begin);
+  window.addEventListener('resize', () => { if (reduceMotion) boards.forEach(b => { b.resize(); b.draw(0); }); });
+})();
+</script>
+</body>
+</html>
