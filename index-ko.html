@@ -6,7 +6,7 @@
 <title>폰전광판 · Phone Banner</title>
 <meta name="description" content="폰 하나로 띄우는 응원 LED 전광판. 문구만 쓰면 바로 가로 전체화면 전광판이 됩니다.">
 <link rel="alternate" hreflang="en" href="index.html">
-<link rel="alternate" hreflang="ko" href="ko.html">
+<link rel="alternate" hreflang="ko" href="index-ko.html">
 <link rel="alternate" hreflang="x-default" href="index.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -164,14 +164,67 @@ footer{padding:40px 0 56px;color:var(--sub);font-size:14px}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:24px}
 
 @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+
+section[id]{scroll-margin-top:80px}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #FF4D8D;outline-offset:4px}
+.cta{display:inline-flex;align-items:center;justify-content:center;padding:13px 22px;border-radius:12px;background:var(--primary);color:white;text-decoration:none;font-weight:700;margin-top:24px}
+.hero .cta{background:white;color:#1E3A8A}
+.new-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.new-card{padding:32px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.new-card h3{font-size:26px;margin:16px 0}.new-card p{color:var(--sub)}
+.new-card ol{padding-left:24px}.new-card li{margin:10px 0}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;background:var(--primary-soft);color:var(--primary);font-size:13px;font-weight:700}
+.group-demo{display:flex;gap:8px;margin:25px 0}.group-demo span{flex:1;min-width:0;background:#05070D;border:4px solid #26304A;border-radius:10px;color:#FF4D8D;text-align:center;padding:22px 0;font-size:clamp(18px,3vw,36px);font-weight:900;text-shadow:0 0 14px #FF4D8D88}
+.lights{display:flex;gap:12px;margin:25px 0}.lights span{height:92px;flex:1;border:5px solid #26304A;border-radius:16px;background:var(--light)}
+.faq details{border-bottom:1px solid var(--line);padding:20px 0}.faq summary{cursor:pointer;font-weight:700;font-size:18px}.faq details p{padding-top:12px;color:var(--sub);max-width:800px}
+.download{text-align:center;background:var(--primary-soft);border-radius:24px;padding:44px 24px}.download p{margin-top:16px;color:var(--sub)}
+footer .wrap{flex-wrap:wrap;gap:16px}footer a{color:var(--sub)}
+.skip{position:fixed;top:-100px;left:16px;z-index:99;background:var(--surface);padding:12px}.skip:focus{top:8px}
+@media(max-width:720px){.new-grid{grid-template-columns:1fr}.new-card{padding:24px}.nav .wrap{gap:6px}.brand{font-size:16px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* Responsive navigation and touch targets, including narrow phones and landscape. */
+.hero .wrap > *, .try > *, .play-wrap > *, .new-grid > *{min-width:0}
+.brand img{width:36px;height:36px;border-radius:9px;flex:none}
+.nav .lang{min-height:44px}.seg button,.toggles button,.teams button{min-height:44px}
+.sw button{width:44px;height:44px}.cta{min-height:48px}
+summary{padding:4px 0;overflow-wrap:anywhere}
+@media(max-width:960px){
+ .nav .wrap{height:auto;min-height:64px;flex-wrap:wrap;padding-top:8px;padding-bottom:8px}
+ .nav .lang{margin-left:auto}
+ .nav ul{display:flex;order:3;flex-basis:100%;min-width:0;overflow-x:auto;margin:0;gap:0}
+ .nav ul a{white-space:nowrap;min-height:44px;padding:10px 12px}
+ section[id]{scroll-margin-top:132px}
+}
+@media(max-width:360px){.wrap{padding-left:14px;padding-right:14px}.try{padding:14px}.ctrl{min-width:0}.seg{flex-wrap:wrap}.brand{font-size:15px}}
 </style>
+<script>
+(() => {
+ const url = new URL(location.href);
+ const explicit = url.searchParams.get('lang');
+ const supported = value => value === 'en' || value === 'ko';
+ let saved;
+ try { saved = localStorage.getItem('homeLang'); } catch (_) {}
+ if (supported(explicit)) { try { localStorage.setItem('homeLang', explicit); } catch (_) {} }
+ const current = document.documentElement.lang;
+ let target = supported(explicit) ? explicit : supported(saved) ? saved : null;
+ // A direct Korean URL stays Korean. Only the default entry detects browser languages.
+ if (!target && current === 'en') {
+   const languages = navigator.languages || [navigator.language];
+   target = languages.map(value => String(value).toLowerCase().split('-')[0]).find(supported) || 'en';
+ }
+ target = target || current;
+ if (target !== current) location.replace((target === 'ko' ? 'index-ko.html' : 'index.html') + '?lang=' + target + location.hash);
+})();
+</script><link rel="icon" href="icons/app-icon.png">
 </head>
 <body>
+<a class="skip" href="#top">본문으로 이동</a>
 
 <header class="nav">
   <div class="wrap">
     <a class="brand" href="#top" aria-label="폰전광판 처음으로">
-      <span class="logo" aria-hidden="true"><i><b></b><b class="o"></b><b></b><b></b><b></b><b></b><b class="o"></b><b></b><b class="o"></b></i></span>
+      <img src="icons/app-icon.png" alt="" width="36" height="36">
       폰전광판
     </a>
     <ul>
@@ -179,9 +232,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
       <li><a href="#features">기능</a></li>
       <li><a href="#try">직접 해 보기</a></li>
       <li><a href="#templates">템플릿</a></li>
-      <li><a href="#play">재생 화면</a></li>
+      <li><a href="#together">함께 응원</a></li>
     </ul>
-    <a class="lang" href="index.html" hreflang="en" lang="en"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>English</a>
+    <a class="lang" href="index.html?lang=en" hreflang="en" lang="en"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>English</a>
   </div>
 </header>
 
@@ -195,9 +248,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
         <div class="chips" aria-label="쓰임새">
           <span>야구</span><span>축구</span><span>콘서트</span><span>생일</span><span>공항 마중</span>
         </div>
+<a class="cta" href="https://play.google.com/store/apps/details?id=com.phonensoft.phonebanner">Google Play에서 보기</a>
       </div>
       <div class="phone" aria-hidden="true">
-        <div class="phone-inner"><div class="screen"><canvas id="heroLed"></canvas></div></div>
+        <div class="phone-inner"><div class="screen"><canvas id="heroLed">Phone Banner · LED</canvas></div></div>
       </div>
     </div>
   </div>
@@ -210,7 +264,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
       <p class="sec-lead">관중석, 공연장, 생일 파티, 공항 입국장까지. 하고 싶은 말을 멀리서도 보이는 LED 글자로 띄워요.</p>
       <div class="uses">
         <article class="use"><div class="mini"><canvas data-led='{"text":"홈런!","color":"#FFD23D","fixed":true,"glow":true}'></canvas></div><h3>야구장 · 축구장</h3><p>홈런, 골, 선수 응원을 한 번에.</p></article>
-        <article class="use"><div class="mini"><canvas data-led='{"text":"사랑해요 ♥","color":"#FF4D8D","blink":true}'></canvas></div><h3>콘서트</h3><p>좋아하는 마음을 반짝이게.</p></article>
+        <article class="use"><div class="mini"><canvas data-led='{"text":"사랑해요 ♥","color":"#FF4D8D","blink":false}'></canvas></div><h3>콘서트</h3><p>좋아하는 마음을 반짝이게.</p></article>
         <article class="use"><div class="mini"><canvas data-led='{"text":"생일 축하해","rainbow":true}'></canvas></div><h3>생일 · 기념일</h3><p>무지개 글자로 깜짝 축하.</p></article>
         <article class="use"><div class="mini"><canvas data-led='{"text":"환영해요!","color":"#FFFFFF"}'></canvas></div><h3>공항 마중</h3><p>멀리서도 한눈에 알아보게.</p></article>
       </div>
@@ -269,7 +323,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
     <div class="wrap">
       <span class="eyebrow">직접 해 보기</span>
       <h2 class="sec-title">이 화면에서 바로 꾸며 보세요</h2>
-      <p class="sec-lead">앱의 편집 화면과 같은 방식으로 움직여요. 문구를 바꾸고 색과 효과를 눌러 보세요.</p>
+      <p class="sec-lead">앱의 기능을 간단히 체험하는 웹 미리보기예요. 문구를 바꾸고 색과 효과를 눌러 보세요.</p>
       <div class="try">
         <div class="phone" aria-hidden="true">
           <div class="phone-inner"><div class="screen"><canvas id="tryLed"></canvas></div></div>
@@ -365,14 +419,20 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
       <div class="promise">
         <div><div class="num">2탭</div><h3>문구 입력부터 재생까지</h3><p>쓰고, 누르면 끝. 응원은 타이밍이니까요.</p></div>
         <div><div class="num">오프라인</div><h3>인터넷 없이 동작</h3><p>데이터가 잘 안 터지는 경기장에서도 그대로 써요.</p></div>
-        <div><div class="num">내 폰 안에</div><h3>저장은 기기에만</h3><p>만든 전광판과 최근 문구는 내 폰에만 저장돼요.</p></div>
+        <div><div class="num">내 폰 안에</div><h3>내 기기에 저장</h3><p>전광판과 최근 문구는 기기에 저장돼요. Android 설정에 따라 백업·기기 이전에 포함될 수 있어요.</p></div>
       </div>
     </div>
   </section>
+<section id="together"><div class="wrap"><span class="eyebrow">혼자서도, 함께해도</span><h2 class="sec-title">응원의 크기를 더 키워 보세요</h2><p class="sec-lead">폰을 이어 큰 문장을 만들고, 나만의 색으로 관중석을 밝혀요.</p><div class="new-grid">
+<article class="new-card"><span class="badge">단체 응원 · BETA</span><h3>여러 폰이 하나의 전광판</h3><p>주변 기기 직접 연결로 최대 4대의 폰에서 문구가 이어서 흘러가요. 인터넷 연결 없이 함께 재생할 수 있어요.</p><div class="group-demo" aria-label="여러 폰을 이어 놓은 예시"><span>함께</span><span>응원</span><span>해요 ♥</span></div><ol><li>방장이 방을 만들어요.</li><li>친구들이 방 코드 또는 QR 스캔으로 참여해요.</li><li>방장이 폰 순서를 정하고 함께 재생해요.</li></ol><p>Google Play 서비스와 블루투스가 필요해요. 연결 권한을 허용하고 폰을 가까이 놓아 주세요.</p></article>
+<article class="new-card"><span class="badge">응원봉 · 조명</span><h3>오늘의 응원은 이 색으로</h3><p>화면을 단색 응원봉으로 쓰고 손전등과 스트로브도 켤 수 있어요. 소리 반응을 켜면 주변 소리 크기에 따라 화면 밝기가 변해요.</p><div class="lights" aria-hidden="true"><span style="--light:#FF4D8D"></span><span style="--light:#3DE8FF"></span><span style="--light:#C6FF3D"></span></div><p>마이크는 소리 반응을 켰을 때만 사용하며, 소리를 녹음하거나 전송하지 않아요. 손전등은 지원 기기에서 사용할 수 있어요.</p><p style="margin-top:16px">깜빡이는 빛에 민감하다면 스트로브와 깜빡임 효과 사용에 주의해 주세요.</p></article></div></div></section>
+<section class="faq"><div class="wrap"><span class="eyebrow">궁금한 점</span><h2 class="sec-title">시작하기 전에</h2><details><summary>어떤 휴대폰에서 사용할 수 있나요?</summary><p>Android 7.0 이상을 지원해요. 단체 응원에는 Google Play 서비스와 블루투스가 필요하고, 손전등은 기기 지원 여부에 따라 달라요.</p></details><details><summary>인터넷 없이 쓸 수 있나요?</summary><p>전광판 재생과 주변 기기 직접 연결을 통한 단체 응원은 인터넷 없이 사용할 수 있어요. 앱 설치, 광고 로드, QR 스캐너 구성요소의 최초 다운로드 등에는 인터넷 연결이 필요할 수 있어요.</p></details><details><summary>광고나 구매 기능이 있나요?</summary><p>앱에 광고가 포함되어 있어요. 전광판 재생 화면에는 광고가 없고, 응원봉을 열 때는 전면 광고가 표시될 수 있어요. 인앱 구매 기능은 없어요.</p></details><details><summary>문구와 마이크 소리는 어디에 저장되나요?</summary><p>저장한 전광판과 최근 문구는 기기에 보관하며, Android 설정에 따라 백업되거나 새 기기로 이전될 수 있어요. 단체 응원에서는 참여 기기에 재생에 필요한 문구와 설정을 전달해요. 소리 반응은 크기만 계산하고 녹음 파일을 만들지 않아요. 광고 관련 정보는 개인정보처리방침에서 확인할 수 있어요.</p></details></div></section>
+<section><div class="wrap"><div class="download"><h2>하고 싶은 말을, 더 크게.</h2><p>폰전광판으로 다음 응원을 준비해 보세요.</p><a class="cta" href="https://play.google.com/store/apps/details?id=com.phonensoft.phonebanner">Google Play에서 보기</a><p>Android 7.0 이상 · 한국어 / English · 광고 포함</p></div></div></section>
 </main>
 
 <footer>
   <div class="wrap">
+    <span><a href="phonebanner-privacy-policy-ko.html">개인정보처리방침</a> · <a href="mailto:jbiglion22@gmail.com">문의</a></span>
     <span>© 폰전광판 · Phone Banner</span>
     <span>구단 이름·로고는 포함하지 않아요. 팀 컬러는 색 조합만 제공합니다.</span>
   </div>
@@ -438,6 +498,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
       if (this.o.fixed) this.o.dir = 'none';
       const key = this.o.text + '|' + this.o.rows;
       if (key !== this.key) { this.key = key; this.mask = buildMask(this.o.text || ' ', this.o.rows); }
+      if (reduceMotion && this.start !== undefined) { this.resize(); this.draw(0); }
     }
     resize() {
       const r = this.canvas.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1);
@@ -538,11 +599,11 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
   const templates = [
     ['홈런!', '#FFD23D', '야구', { fixed: true, glow: true }],
     ['삼진 아웃!', '#3DE8FF', '야구', {}],
-    ['골!', '#C6FF3D', '축구', { fixed: true, blink: true }],
+    ['골!', '#C6FF3D', '축구', { fixed: true, blink: false }],
     ['대~한민국', '#FF3B3B', '축구', {}],
     ['우리 오빠 최고!', '#B98CFF', '콘서트', { shape: 'star' }],
     ['생일 축하해', '#FFB020', '생일', { rainbow: true }],
-    ['사랑해 ♥', '#FF4D8D', '고백', { blink: true, shape: 'heart' }],
+    ['사랑해 ♥', '#FF4D8D', '고백', { blink: false, shape: 'heart' }],
     ['환영해요!', '#FFFFFF', '마중', {}],
   ];
   const teams = [

@@ -164,14 +164,67 @@ footer{padding:40px 0 56px;color:var(--sub);font-size:14px}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:24px}
 
 @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+
+section[id]{scroll-margin-top:80px}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #FF4D8D;outline-offset:4px}
+.cta{display:inline-flex;align-items:center;justify-content:center;padding:13px 22px;border-radius:12px;background:var(--primary);color:white;text-decoration:none;font-weight:700;margin-top:24px}
+.hero .cta{background:white;color:#1E3A8A}
+.new-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.new-card{padding:32px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.new-card h3{font-size:26px;margin:16px 0}.new-card p{color:var(--sub)}
+.new-card ol{padding-left:24px}.new-card li{margin:10px 0}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;background:var(--primary-soft);color:var(--primary);font-size:13px;font-weight:700}
+.group-demo{display:flex;gap:8px;margin:25px 0}.group-demo span{flex:1;min-width:0;background:#05070D;border:4px solid #26304A;border-radius:10px;color:#FF4D8D;text-align:center;padding:22px 0;font-size:clamp(18px,3vw,36px);font-weight:900;text-shadow:0 0 14px #FF4D8D88}
+.lights{display:flex;gap:12px;margin:25px 0}.lights span{height:92px;flex:1;border:5px solid #26304A;border-radius:16px;background:var(--light)}
+.faq details{border-bottom:1px solid var(--line);padding:20px 0}.faq summary{cursor:pointer;font-weight:700;font-size:18px}.faq details p{padding-top:12px;color:var(--sub);max-width:800px}
+.download{text-align:center;background:var(--primary-soft);border-radius:24px;padding:44px 24px}.download p{margin-top:16px;color:var(--sub)}
+footer .wrap{flex-wrap:wrap;gap:16px}footer a{color:var(--sub)}
+.skip{position:fixed;top:-100px;left:16px;z-index:99;background:var(--surface);padding:12px}.skip:focus{top:8px}
+@media(max-width:720px){.new-grid{grid-template-columns:1fr}.new-card{padding:24px}.nav .wrap{gap:6px}.brand{font-size:16px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* Responsive navigation and touch targets, including narrow phones and landscape. */
+.hero .wrap > *, .try > *, .play-wrap > *, .new-grid > *{min-width:0}
+.brand img{width:36px;height:36px;border-radius:9px;flex:none}
+.nav .lang{min-height:44px}.seg button,.toggles button,.teams button{min-height:44px}
+.sw button{width:44px;height:44px}.cta{min-height:48px}
+summary{padding:4px 0;overflow-wrap:anywhere}
+@media(max-width:960px){
+ .nav .wrap{height:auto;min-height:64px;flex-wrap:wrap;padding-top:8px;padding-bottom:8px}
+ .nav .lang{margin-left:auto}
+ .nav ul{display:flex;order:3;flex-basis:100%;min-width:0;overflow-x:auto;margin:0;gap:0}
+ .nav ul a{white-space:nowrap;min-height:44px;padding:10px 12px}
+ section[id]{scroll-margin-top:132px}
+}
+@media(max-width:360px){.wrap{padding-left:14px;padding-right:14px}.try{padding:14px}.ctrl{min-width:0}.seg{flex-wrap:wrap}.brand{font-size:15px}}
 </style>
+<script>
+(() => {
+ const url = new URL(location.href);
+ const explicit = url.searchParams.get('lang');
+ const supported = value => value === 'en' || value === 'ko';
+ let saved;
+ try { saved = localStorage.getItem('homeLang'); } catch (_) {}
+ if (supported(explicit)) { try { localStorage.setItem('homeLang', explicit); } catch (_) {} }
+ const current = document.documentElement.lang;
+ let target = supported(explicit) ? explicit : supported(saved) ? saved : null;
+ // A direct Korean URL stays Korean. Only the default entry detects browser languages.
+ if (!target && current === 'en') {
+   const languages = navigator.languages || [navigator.language];
+   target = languages.map(value => String(value).toLowerCase().split('-')[0]).find(supported) || 'en';
+ }
+ target = target || current;
+ if (target !== current) location.replace((target === 'ko' ? 'index-ko.html' : 'index.html') + '?lang=' + target + location.hash);
+})();
+</script><link rel="icon" href="icons/app-icon.png">
 </head>
 <body>
+<a class="skip" href="#top">Skip to content</a>
 
 <header class="nav">
   <div class="wrap">
     <a class="brand" href="#top" aria-label="Phone Banner home">
-      <span class="logo" aria-hidden="true"><i><b></b><b class="o"></b><b></b><b></b><b></b><b></b><b class="o"></b><b></b><b class="o"></b></i></span>
+      <img src="icons/app-icon.png" alt="" width="36" height="36">
       Phone Banner
     </a>
     <ul>
@@ -179,9 +232,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
       <li><a href="#features">Features</a></li>
       <li><a href="#try">Try it</a></li>
       <li><a href="#templates">Templates</a></li>
-      <li><a href="#play">Playback</a></li>
+      <li><a href="#together">Together</a></li>
     </ul>
-    <a class="lang" href="index-ko.html" hreflang="ko" lang="ko"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>한국어</a>
+    <a class="lang" href="index-ko.html?lang=ko" hreflang="ko" lang="ko"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>한국어</a>
   </div>
 </header>
 
@@ -195,9 +248,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
         <div class="chips" aria-label="Use cases">
           <span>Baseball</span><span>Soccer</span><span>Concerts</span><span>Birthdays</span><span>Airport pickups</span>
         </div>
+<a class="cta" href="https://play.google.com/store/apps/details?id=com.phonensoft.phonebanner">Get it on Google Play</a>
       </div>
       <div class="phone" aria-hidden="true">
-        <div class="phone-inner"><div class="screen"><canvas id="heroLed"></canvas></div></div>
+        <div class="phone-inner"><div class="screen"><canvas id="heroLed">Phone Banner · LED</canvas></div></div>
       </div>
     </div>
   </div>
@@ -210,7 +264,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
       <p class="sec-lead">In the stands, at a concert, at a birthday party or in the arrivals hall — show your message in LED letters people can read from far away.</p>
       <div class="uses">
         <article class="use"><div class="mini"><canvas data-led='{"text":"GOAL!","color":"#FFD23D","fixed":false,"glow":true}'></canvas></div><h3>Stadiums</h3><p>Home runs, goals and your favorite player.</p></article>
-        <article class="use"><div class="mini"><canvas data-led='{"text":"Love you ♥","color":"#FF4D8D","blink":true}'></canvas></div><h3>Concerts</h3><p>Let your love for the stage shine.</p></article>
+        <article class="use"><div class="mini"><canvas data-led='{"text":"Love you ♥","color":"#FF4D8D","blink":false}'></canvas></div><h3>Concerts</h3><p>Let your love for the stage shine.</p></article>
         <article class="use"><div class="mini"><canvas data-led='{"text":"Happy Birthday","rainbow":true}'></canvas></div><h3>Birthdays &amp; parties</h3><p>Surprise them with rainbow letters.</p></article>
         <article class="use"><div class="mini"><canvas data-led='{"text":"Welcome!","color":"#FFFFFF"}'></canvas></div><h3>Airport pickups</h3><p>Easy to spot across the hall.</p></article>
       </div>
@@ -269,7 +323,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
     <div class="wrap">
       <span class="eyebrow">Try it</span>
       <h2 class="sec-title">Style one right here</h2>
-      <p class="sec-lead">It works just like the editor in the app. Change the message and play with colors and effects.</p>
+      <p class="sec-lead">A simple web preview of the app’s features. Change the message and try colors and effects.</p>
       <div class="try">
         <div class="phone" aria-hidden="true">
           <div class="phone-inner"><div class="screen"><canvas id="tryLed"></canvas></div></div>
@@ -365,14 +419,20 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
       <div class="promise">
         <div><div class="num">2 taps</div><h3>From typing to playing</h3><p>Type and tap. Cheering is all about timing.</p></div>
         <div><div class="num">Offline</div><h3>No internet needed</h3><p>Works even in packed stadiums with no signal.</p></div>
-        <div><div class="num">On device</div><h3>Stays on your phone</h3><p>Your banners and recent messages are stored only on your device.</p></div>
+        <div><div class="num">On device</div><h3>Saved on your device</h3><p>Banners and recent messages are saved locally. Android settings may allow backup or transfer to a new device.</p></div>
       </div>
     </div>
   </section>
+<section id="together"><div class="wrap"><span class="eyebrow">SOLO OR TOGETHER</span><h2 class="sec-title">Make your cheer even bigger</h2><p class="sec-lead">Join phones into one message, or light up the crowd in your favorite color.</p><div class="new-grid">
+<article class="new-card"><span class="badge">Group cheering · BETA</span><h3>More phones. One banner.</h3><p>Connect up to 4 nearby phones and scroll one message across their screens. Group playback works without an internet connection.</p><div class="group-demo" aria-label="Illustration of a message across phones"><span>LET’S</span><span>GO</span><span>TEAM ♥</span></div><ol><li>The host creates a room.</li><li>Friends join using the room code or QR scanner.</li><li>The host arranges the phones and starts playback.</li></ol><p>Google Play services and Bluetooth are required. Allow nearby connection permissions and keep your phones close together.</p></article>
+<article class="new-card"><span class="badge">Lightstick & lighting</span><h3>Find your color in the crowd</h3><p>Turn your screen into a solid-color lightstick, use the flashlight or strobe, or enable sound response to change screen brightness with ambient sound levels.</p><div class="lights" aria-hidden="true"><span style="--light:#FF4D8D"></span><span style="--light:#3DE8FF"></span><span style="--light:#C6FF3D"></span></div><p>The microphone is used only while sound response is enabled. Audio is neither recorded nor transmitted. Flashlight availability depends on your device.</p><p style="margin-top:16px">Use caution with strobe and blinking effects if you are sensitive to flashing lights.</p></article></div></div></section>
+<section class="faq"><div class="wrap"><span class="eyebrow">GOOD TO KNOW</span><h2 class="sec-title">Before your first cheer</h2><details><summary>Which phones are supported?</summary><p>Android 7.0 and above. Group cheering requires Google Play services and Bluetooth. Flashlight features depend on device support.</p></details><details><summary>Does it work offline?</summary><p>Banner playback and nearby group cheering work without internet. Installing the app, loading ads, and initially downloading QR scanner components may need an internet connection.</p></details><details><summary>Are there ads or in-app purchases?</summary><p>The app contains ads. Banner playback is ad-free, and an interstitial ad may appear when opening the lightstick. There are no in-app purchases.</p></details><details><summary>What happens to my messages and audio?</summary><p>Saved banners and recent messages are stored locally and may be backed up or transferred by Android, depending on your settings. Group cheering shares the message and playback settings with participating phones. Sound response measures volume without creating audio recordings. See the privacy policy for advertising-related data practices.</p></details></div></section>
+<section><div class="wrap"><div class="download"><h2>Say it brighter.</h2><p>Get ready for your next cheer with Phone Banner.</p><a class="cta" href="https://play.google.com/store/apps/details?id=com.phonensoft.phonebanner">Get it on Google Play</a><p>Android 7.0+ · English / 한국어 · Contains ads</p></div></div></section>
 </main>
 
 <footer>
   <div class="wrap">
+    <span><a href="phonebanner-privacy-policy.html?lang=en">Privacy policy</a> · <a href="mailto:jbiglion22@gmail.com">Contact</a></span>
     <span>© Phone Banner</span>
     <span>No team names or logos are included — team colors are color combinations only.</span>
   </div>
@@ -438,6 +498,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
       if (this.o.fixed) this.o.dir = 'none';
       const key = this.o.text + '|' + this.o.rows;
       if (key !== this.key) { this.key = key; this.mask = buildMask(this.o.text || ' ', this.o.rows); }
+      if (reduceMotion && this.start !== undefined) { this.resize(); this.draw(0); }
     }
     resize() {
       const r = this.canvas.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1);
@@ -538,11 +599,11 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
   const templates = [
     ['HOME RUN!', '#FFD23D', 'Baseball', { glow: true }],
     ['STRIKE OUT!', '#3DE8FF', 'Baseball', {}],
-    ['GOAL!', '#C6FF3D', 'Soccer', { fixed: true, blink: true }],
+    ['GOAL!', '#C6FF3D', 'Soccer', { fixed: true, blink: false }],
     ['DEFENSE!', '#FF3B3B', 'Soccer', {}],
     ['You are my star!', '#B98CFF', 'Concert', { shape: 'star' }],
     ['Happy Birthday', '#FFB020', 'Birthday', { rainbow: true }],
-    ['Love you ♥', '#FF4D8D', 'Love', { blink: true, shape: 'heart' }],
+    ['Love you ♥', '#FF4D8D', 'Love', { blink: false, shape: 'heart' }],
     ['Welcome home!', '#FFFFFF', 'Pickup', {}],
   ];
   const teams = [
